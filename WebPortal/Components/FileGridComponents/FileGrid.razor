@@ -16,7 +16,7 @@
 @if (!IsSearchResult || CanAddData)
 {
     <div class="header-wrapper" style="margin-left: 2rem" @onclick="UnSelectFiles" @onclick:preventDefault="true" @oncontextmenu="UnSelectFiles" @oncontextmenu:preventDefault="true">
-    <h3 class="nrcan-typography h3">@($"{CurrentFolder.parent?.name??""}/{CurrentFolder.name}/")</h3>
+    <AeTypography class="subtitle">@($"{CurrentFolder.parent?.name??""}/{CurrentFolder.name}/")</AeTypography>
 
         @if (CurrentFolder.parent != null)
         {
@@ -32,6 +32,16 @@
             </div>
         }
     </div>
+
+    @if (_storageMetadata != null)
+    {
+        <AeTypography class="subtitle">Container Name: @_storageMetadata.Container</AeTypography>
+        <AeTypography class="subtitle">AccountName: @_storageMetadata.AccountName</AeTypography>
+        <AeTypography class="subtitle">Account Kind: @_storageMetadata.StorageAccountType</AeTypography>
+        <AeTypography class="subtitle">Replication: @_storageMetadata.GeoRedundancy</AeTypography>
+        <AeTypography class="subtitle">Versioning: @_storageMetadata.Versioning</AeTypography>
+        <AeTypography class="subtitle">Url: @_storageMetadata.Url</AeTypography>
+    }
 }
 
 @if (isLoading)
@@ -92,6 +102,7 @@ else
     public bool IsSearchResult { get; set; } = false;
 
 
+
     //user and file tracking
     public Microsoft.Graph.User CurrentUser { get; set; }
     public string CurrentUserId
@@ -107,7 +118,7 @@ else
         }
     }
 
-
+    private StorageMetadata _storageMetadata;
     private BaseMetadata selectedMetaData;
     private bool isLoading = false;
 
@@ -137,11 +148,14 @@ else
 
 
         if (!string.IsNullOrEmpty(Project))
+        {
             ApiService.ProjectUploadCode = Project.ToLower();
-
+            _storageMetadata = await DataRetrievalService.GetStorageMetadata(Project.ToLower());
+        }
+        
         // If we get displayed on return from file upload, don't refresh from datalake
         await GetFileList();
-
+        
         StateHasChanged();
     }
 

@@ -109,7 +109,25 @@ namespace NRCan.Datahub.Portal.Services
 
             return folder;
         }
+        public async Task<StorageMetadata> GetStorageMetadata(string project)
+        {
+            string cxnstring = await _apiCallService.GetProjectConnectionString(project);
+            BlobServiceClient blobServiceClient = new BlobServiceClient(cxnstring);
+            BlobContainerClient containerClient = blobServiceClient.GetBlobContainerClient("datahub");
 
+            
+            var accountInfo = blobServiceClient.GetAccountInfo().Value;
+            //var accountype = accountInfo.Value
+            //var skuName = accountInfo.SkuName;
+            var storeageMetadata = new StorageMetadata();
+
+            storeageMetadata.Container = "datahub";
+            storeageMetadata.Url = containerClient.Uri.ToString();
+            storeageMetadata.Versioning = "True";
+            storeageMetadata.GeoRedundancy = accountInfo.SkuName.ToString();
+            storeageMetadata.StorageAccountType = accountInfo.AccountKind.ToString();
+            return storeageMetadata;
+        }
         private async Task<Folder> GetProjectFileList(string project, Microsoft.Graph.User user)
         {
             try

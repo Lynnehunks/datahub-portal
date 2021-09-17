@@ -36,5 +36,10 @@ namespace NRCan.Datahub.Portal.Services.Offline
         {
             return Task.FromResult(new Shared.Data.Folder());
         }
+
+        public Task<StorageMetadata> GetStorageMetadata(string project)
+        {
+            return Task.FromResult(new Shared.Data.StorageMetadata());
+        }
     }
 }
